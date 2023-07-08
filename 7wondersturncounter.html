@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Turn Counter</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+  <div id="inputContainer">
+    <input type="text" id="turnsPerSetInput" placeholder="Enter turns per set">
+    <button id="confirmButton">Confirm</button>
+  </div>
+  <h1 id="ageLabel">AGE I</h1>
+  <div id="turnCounter" style="display: none;">
+    <p id="counter">0</p>
+    <img id="image" src="images/leader.png" alt="Leader Image">
+  </div>
+
+  <button id="resetButton">Reset</button>
+
+  <script>
+    var turnsPerSet = null;
+    var currentSet = 1;
+    var currentTurn = 0;
+    var navalDisplayed = false;
+
+    function confirmTurnsPerSet() {
+      var turnsPerSetInput = document.getElementById("turnsPerSetInput");
+      turnsPerSet = parseInt(turnsPerSetInput.value);
+      if (isNaN(turnsPerSet) || turnsPerSet <= 0) {
+        alert("Please enter a valid number of turns per set.");
+        return;
+      }
+      turnsPerSetInput.value = "";
+      turnsPerSetInput.disabled = true;
+      document.getElementById("confirmButton").disabled = true;
+      document.getElementById("inputContainer").style.display = "none";
+      document.getElementById("turnCounter").style.display = "flex"; // Show turnCounter
+      updateCounter();
+    }
+
+    function advanceTurnCounter() {
+      currentTurn++;
+      if (currentTurn > turnsPerSet + 2) { // Add 2 to account for the additional images
+        currentTurn = 0;
+        currentSet++;
+        if (currentSet > 3) {
+          currentSet = 1;
+        }
+        updateAgeLabel();
+      }
+      updateImage();
+      updateCounter();
+    }
+
+    function updateImage() {
+      var image = document.getElementById("image");
+      if (currentTurn === 0) {
+        image.src = "images/leader.png";
+      } else if (currentTurn === turnsPerSet + 1) {
+        image.src = "images/war.png";
+      } else if (currentTurn === turnsPerSet + 2) {
+        image.src = "images/naval.png";
+        if (currentSet === 3) {
+          navalDisplayed = true;
+        }
+      } else {
+        image.src = "images/age" + currentSet + ".png";
+      }
+    }
+
+    function updateAgeLabel() {
+      var ageLabel = document.getElementById("ageLabel");
+      if (currentSet === 1) {
+        ageLabel.textContent = "AGE I";
+      } else if (currentSet === 2) {
+        ageLabel.textContent = "AGE II";
+      } else if (currentSet === 3) {
+        ageLabel.textContent = "AGE III";
+      }
+    }
+
+    function updateCounter() {
+      var counter = document.getElementById("counter");
+      if (currentTurn === 0 || currentTurn === turnsPerSet + 1 || currentTurn === turnsPerSet + 2) {
+        counter.textContent = "";
+      } else {
+        counter.textContent = currentTurn.toString();
+      }
+    }
+
+    function handleClick() {
+      if (currentSet === 3 && navalDisplayed) {
+        var image = document.getElementById("image");
+        image.src = "images/end.png";
+      } else {
+        advanceTurnCounter();
+      }
+    }
+
+    // Attach event listener to the image for click events
+    var imageElement = document.getElementById("image");
+    imageElement.addEventListener("click", handleClick);
+
+    // Attach event listener to the confirm button
+    var confirmButton = document.getElementById("confirmButton");
+    confirmButton.addEventListener("click", confirmTurnsPerSet);
+
+    // Attach event listener to the reset button
+    var resetButton = document.getElementById("resetButton");
+    resetButton.addEventListener("click", function() {
+      location.reload();
+    });
+  </script>
+</body>
+</html>
